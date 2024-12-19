@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortLy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bitly-blue': '#00246B',
+                        'bitly-orange': '#CADCFC',
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-bitly-blue text-white min-h-screen">
+
+    <nav class="bg-bitly-blue shadow-md py-4 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/">
+                <h1 class="text-xl font-extrabold ">ShortLy</h1>
+            </a>
+            <div class="flex space-x-4">
+                <a href="#" class="text-white hover:text-bitly-orange mt-2">Log in</a>
+                <a href="/u/signup" class=" text-white px-4 py-2 rounded hover:bg-white hover:text-bitly-blue transition duration-300">Sign up Free</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12 text-center mt-5 mb-5">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Build stronger digital connections</h1>
+        <p style="color: #CADCFC;" class="text-xl mb-12 max-w-3xl mx-auto">
+            Use our URL shortener to simplify and manage your links. Create and track shortened URLs easily with the ShortLy Connections Platform.
+        </p>
+        <!-- for error messages -->
+        <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+    
+        <div class="bg-white text-bitly-blue p-8 rounded-lg max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4">Shorten a long link</h2>
+            <form id="shorten-form" class="space-y-4">
+                <div>
+                    <label for="long-link" class="block text-left mb-2">Paste your long link here</label>
+                    <input 
+                        type="url" 
+                        id="long-link" 
+                        placeholder="https://example.com/my-long-url" 
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p id="error-message" class="text-red-600 mt-2 hidden">Please enter a valid URL.</p>
+                </div>
+                <button 
+                style="background-color:#00246B;"
+                    type="submit" 
+                    class="text-white px-6 py-3 rounded hover:bg-blue-700 disabled:opacity-50" 
+                    disabled>
+                    Get your link for free &rarr;
+                </button>
+            </form>
+            <!-- Warning Note -->
+            <div class="mt-6 bg-yellow-100 text-yellow-800 p-4 rounded">
+                <p class="text-sm font-medium">
+                    <strong>Note:</strong> These URLs won't be saved unless you create an account. Sign up to save your links and track their performance.
+                </p>
+            </div>
+        </div>
+    </main>
+    
+
+    <footer class="bg-bitly-blue py-8">
+        <div class="container mx-auto px-4 text-center space-y-4">
+            <p class="text-sm">&copy; 2024 ShortLy. All rights reserved.</p>
+            <p class="text-sm">Created by <a href="#" class=" hover:underline">Salim KM</a></p>
+        </div>
+    </footer>
+
+    <script type="module" src="/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <script>
+        function showToast(message, type = "success") {
+        const toastContainer = document.getElementById("toast-container");
+        
+        // Create a toast element
+        const toast = document.createElement("div");
+        toast.className = `flex items-center p-4 mb-4 rounded-lg shadow-lg text-white ${type === "success" ? "bg-green-500" : "bg-red-500"}`;
+        toast.innerHTML = `
+            <span class="text-sm font-medium">${message}</span>
+            <button class="ml-auto text-white hover:text-gray-200" onclick="this.parentElement.remove()">
+                &times;
+            </button>
+        `;
+
+        // Append to container
+        toastContainer.appendChild(toast);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => toast.remove(), 5000);
+    }
+    </script>
+
+    <script>
+        const form = document.getElementById('shorten-form');
+        const longLinkInput = document.getElementById('long-link');
+        const errorMessage = document.getElementById('error-message');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const mainContainer = document.querySelector('main'); // Reference to main container for appending the new div
+    
+        
+        // Live validation
+        longLinkInput.addEventListener('input', () => {
+            const urlPattern = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+            const isValid = urlPattern.test(longLinkInput.value);
+    
+            if (isValid) {
+                errorMessage.classList.add('hidden');
+                submitButton.disabled = false;
+            } else {
+                errorMessage.classList.remove('hidden');
+                submitButton.disabled = true;
+            }
+        });
+    
+        // Form submission
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const longUrl = longLinkInput.value;
+    
+            try {
+                // Replace with your backend API
+                const response = await axios.post('/short', { origUrl: longUrl });
+                const shortUrl = response.data.shortUrl;
+
+                if(response.data.success) { 
+                    console.log(shortUrl);
+                
+                    // Create a new div for the shortened URL
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'mt-8 p-4 bg-bitly-orange text-white rounded-lg flex items-center justify-between';
+        
+                    resultDiv.innerHTML = `
+                        <span class="truncate">${shortUrl}</span>
+                        <button 
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" 
+                            onclick="copyToClipboard('${shortUrl}')">
+                            Copy
+                        </button>
+                    `;
+        
+                    // Append the div to the main container
+                    mainContainer.appendChild(resultDiv);
+        
+                    // Reset the form
+                    form.reset();
+                    submitButton.disabled = true;
+                }else {
+                    showToast('URL already shortened! Redirecting', 'info');
+                }
+            } catch (error) {
+                console.error('Error shortening the URL:', error.message);
+            }
+        });
+    
+        // Copy to Clipboard Function
+        function copyToClipboard(text) {
+        navigator.clipboard.writeText(text)
+        .then(() => {
+            showToast('URL copied to ClipBoard', 'success');
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            showToast('Failed to copy to clipboard', 'error');
+        });
+}
+
+    </script>
+    
+
+
+</body>
+</html>

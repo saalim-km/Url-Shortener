@@ -1,9 +1,17 @@
 import express from 'express';
-import {nanoid} from 'nanoid';
-import Url from '../models/url.js';
-import {validateUrl} from '../utils/url.js';
-import {postUrl} from '../controllers/urlGen.js'
+import {postUrl, getUrl, homePage, signup, signUpPage} from '../controllers/urlGen.js'
 
 const router = express.Router();
 
+//? post request for creating short url
 router.post('/short',postUrl);
+
+//? for redirecting
+router.get('/link/:url',getUrl);
+
+//? base url
+router.get('/',homePage)
+
+
+
+export default router;

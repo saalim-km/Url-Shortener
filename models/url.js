@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const urlSchema = new mongoose.Schema(
   {
@@ -22,5 +22,6 @@ const urlSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 export default mongoose.model('Url',urlSchema);

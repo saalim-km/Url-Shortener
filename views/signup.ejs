@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ShortLy URL Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00246B',
+                        secondary: '#CADCFC',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-center">
+                <a href="/" class="flex items-center">
+                    <h1 class="text-2xl font-extrabold text-primary">ShortLy</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 mb-5">
+        <div class="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Left Section (Form) -->
+            <div class="w-full md:w-1/2 p-8 lg:p-12">
+                <div class="max-w-md mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Create your account</h2>
+                    
+                    <form id="signupForm" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="name" name="name"  
+                                class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition duration-200">
+                            <p id="nameError" class="mt-1 text-xs text-red-500 transition-opacity opacity-0">Please enter your full name (at least 2 words).</p>
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <input type="email" id="email" name="email"  
+                                class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition duration-200">
+                            <p id="emailError" class="mt-1 text-xs text-red-500 transition-opacity opacity-0">Please enter a valid email address.</p>
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" id="password" name="password"  
+                                class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition duration-200">
+                            <p id="passwordError" class="mt-1 text-xs text-red-500 transition-opacity opacity-0">Password must be at least 8 characters with 1 uppercase, 1 lowercase & 1 number.</p>
+                        </div>
+
+                        <div>
+                            <button type="submit" 
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200">
+                                Create Account
+                            </button>
+                        </div>
+
+                        <p class="mt-6 text-xs text-gray-500 text-center leading-relaxed">
+                            By creating an account, you agree to ShortLy's 
+                            <a href="#" class="text-primary hover:text-blue-700">Terms of Service</a>, 
+                            <a href="#" class="text-primary hover:text-blue-700">Privacy Policy</a> and 
+                            <a href="#" class="text-primary hover:text-blue-700">Acceptable Use Policy</a>.
+                        </p>
+                    </form>
+
+                    <p class="mt-8 text-sm text-gray-600 text-center">
+                        Already have an account? 
+                        <a href="#" class="font-medium text-primary hover:text-blue-700">Log in</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Section (Image) -->
+            <div class="hidden md:block md:w-1/2 bg-secondary">
+                <img style="object-fit:contain;" src="/images/signup.png" alt="Sign Up Illustration" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('signupForm');
+        const nameInput = document.getElementById('name');
+        const nameError = document.getElementById('nameError');
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('emailError');
+        const passwordInput = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
+
+        // Validation functions
+        const validateName = (name) => {
+            const words = name.trim().split('');
+            return words.length >= 2;
+        };
+
+        const validateEmail = (email) => {
+            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|io|co|info|xyz|tech)$/i;
+            return re.test(String(email).toLowerCase());
+        };
+
+        const validatePassword = (password) => {
+            const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+            return re.test(password);
+        };
+
+        // Helper function to show/hide error messages smoothly
+        const toggleError = (input, errorElement, isValid) => {
+            if (!isValid) {
+                errorElement.style.opacity = '1';
+                input.classList.add('border-red-300');
+                input.classList.remove('border-gray-300');
+            } else {
+                errorElement.style.opacity = '0';
+                input.classList.remove('border-red-300');
+                input.classList.add('border-gray-300');
+            }
+        };
+
+        // Real-time validation
+        let nameTimeout, emailTimeout, passwordTimeout;
+
+        nameInput.addEventListener('input', () => {
+            clearTimeout(nameTimeout);
+            nameTimeout = setTimeout(() => {
+                const isValid = validateName(nameInput.value);
+                toggleError(nameInput, nameError, isValid);
+            }, 500); // Delay validation for better UX
+        });
+
+        emailInput.addEventListener('input', () => {
+            clearTimeout(emailTimeout);
+            emailTimeout = setTimeout(() => {
+                const isValid = validateEmail(emailInput.value);
+                toggleError(emailInput, emailError, isValid);
+            }, 500);
+        });
+
+        passwordInput.addEventListener('input', () => {
+            clearTimeout(passwordTimeout);
+            passwordTimeout = setTimeout(() => {
+                const isValid = validatePassword(passwordInput.value);
+                toggleError(passwordInput, passwordError, isValid);
+            }, 500);
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const isNameValid = validateName(nameInput.value);
+            const isEmailValid = validateEmail(emailInput.value);
+            const isPasswordValid = validatePassword(passwordInput.value);
+
+            toggleError(nameInput, nameError, isNameValid);
+            toggleError(emailInput, emailError, isEmailValid);
+            toggleError(passwordInput, passwordError, isPasswordValid);
+
+            if (isNameValid && isEmailValid && isPasswordValid) {
+                // Here you would typically send the form data to your server
+                console.log('Form submitted successfully!');
+            }
+        });
+    </script>
+
+</body>
+</html>
